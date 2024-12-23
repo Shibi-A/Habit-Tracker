@@ -2,12 +2,33 @@ import React, {useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';  // Import StyleSheet
 import {router} from 'expo-router';
 import { useFonts } from 'expo-font';
-
-
+import { Alert } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 const RegistrationScreen:React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [passwordConfirm, setPasswordConfirm] = useState("");
+    const isLengthValid = password.length >= 9;
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const isValidEmail = ()=> {
+        const emailRegex =
+          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+      };
+    const RegistrationComplete = () =>{
+        if(passwordConfirm===password&&isValidEmail()){
+            router.push(`/screens/MainScreens/Home`);
+        }
+        else if(passwordConfirm!=password){
+            Alert.alert("Passwords don't match")
+        }
+        else if(!isValidEmail()){
+            Alert.alert("Please enter a valid email")
+        }
+    }
 
    
 
@@ -17,7 +38,7 @@ const RegistrationScreen:React.FC = () => {
 
             
 
-            <Text style={styles.welcomeText}>Welcome back</Text>
+            <Text style={styles.welcomeText}>Welcome!</Text>
             <Text style={styles.subText}>Please enter your email and password to sign in</Text>
             <View style={styles.inputBox}>
                 <Text style={styles.EmailWord}>Email</Text>
@@ -41,35 +62,72 @@ const RegistrationScreen:React.FC = () => {
                         secureTextEntry={true}
                     />
                 </View>
+                <Text style={styles.PasswordWord}>Confirm Password</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter password"
+                        value={passwordConfirm}
+                        onChangeText={setPasswordConfirm}
+                        secureTextEntry={true}
+                    />
+                </View>
+            </View>
+            <View style={styles.passwordValidation}>
+                {isLengthValid ? (
+                    <FontAwesome name="check" size={18} color="green" />
+                ) : (
+                    <FontAwesome name="times" size={18} color="red" />
+                )}
+                <Text style={isLengthValid ? styles.validText : styles.invalidText}>
+                    At least 9 characters
+                </Text>
+            </View>
+            <View style={styles.passwordValidation}>
+                {hasNumber ? (
+                    <FontAwesome name="check" size={18} color="green" />
+                ) : (
+                    <FontAwesome name="times" size={18} color="red" />
+                )}
+                <Text style={hasNumber ? styles.validText : styles.invalidText}>
+                    Contains at least one number
+                </Text>
+            </View>
+            <View style={styles.passwordValidation}>
+                {hasSpecialChar ? (
+                    <FontAwesome name="check" size={18} color="green" />
+                ) : (
+                    <FontAwesome name="times" size={18} color="red" />
+                )}
+                <Text style={hasSpecialChar ? styles.validText : styles.invalidText}>
+                    At least one special characters
+                </Text>
+            </View>
+        
+            
+            <View style={styles.passwordValidation}>
+                {hasUppercase ? (
+                    <FontAwesome name="check" size={18} color="green" />
+                ) : (
+                    <FontAwesome name="times" size={18} color="red" />
+                )}
+                <Text style={hasUppercase ? styles.validText : styles.invalidText}>
+                    Contains at least one upper case
+                </Text>
             </View>
             
 
-            <TouchableOpacity style={styles.middle}>
-                <Text style={styles.registerText}>
-                    Forgot Password?{' '}
-                    <Text style={styles.link} onPress={() => router.push('/screens/MainScreens/Home')}>
-                        Reset
-                    </Text>
-                </Text>
-                
-            </TouchableOpacity>
+            
             
             <View style={styles.horizontalLine} />
 
-            <TouchableOpacity style={styles.loginButton} onPress={() => router.push(`/screens/MainScreens/Home`)}>
+            <TouchableOpacity style={styles.loginButton} onPress={() => RegistrationComplete()}>
                 <Text style={styles.loginButtonText}  > 
-                    Log In
+                    Register
                 </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.bottom}>
-                <Text style={styles.registerText}>
-                    Don't have an account?{' '}
-                    <Text style={styles.link} onPress={() => router.push('/screens/MainScreens/Home')}>
-                        Register
-                    </Text>
-                </Text>
-            </TouchableOpacity>
+           
 
 
         </View>
@@ -91,7 +149,7 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 30,
         height:44,
-        top:-30,
+        top:-80,
         fontWeight: 'bold',
         marginBottom: 10,
         textAlign: 'left',
@@ -100,14 +158,14 @@ const styles = StyleSheet.create({
     subText: {
         fontSize: 17,
         color: '#3D3D3D',
-        top: -40,
+        top: -70,
         marginBottom: 20,
      
     },
     EmailWord:
         {
             fontSize: 17,
-            top:-100,
+            top:-140,
             color: '#3D3D3D',
             marginBottom: 20,
             
@@ -115,7 +173,7 @@ const styles = StyleSheet.create({
     PasswordWord:
         {
             fontSize: 17,
-            top:-100,
+            top:-140,
             color: '#3D3D3D',
             marginBottom: 20,
            
@@ -128,7 +186,7 @@ const styles = StyleSheet.create({
     input: {
         height: 50,
         borderColor: '#ccc',
-        top:-110,
+        top:-140,
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 10,
@@ -152,7 +210,7 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         alignItems: 'center',
         height: 55,
-        top:80,
+        top:40,
         
     },
     loginButtonText: {
@@ -201,9 +259,27 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,      // Thickness of the line
         width: '120%',             // Width of the line (can adjust as needed)
         marginVertical: 20,        // Space above and below the line
-        top: 50,
+        top: 10,
         left: -30,
       },
+      validText: {
+        marginLeft: 8,
+        color: 'green',
+        fontSize: 14,
+        fontFamily: 'Sora',
+    },
+    invalidText: {
+        marginLeft: 8,
+        color: 'red',
+        fontSize: 14,
+        fontFamily: 'Sora',
+    },
+    passwordValidation: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        top: 170,
+    },
 });
 
 
